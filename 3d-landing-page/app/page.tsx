@@ -7,24 +7,143 @@ import { useFrame } from "@react-three/fiber";
 import type { Mesh } from "three";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Zap, Shield, Rocket, Users, Award } from "lucide-react";
+import { Star, Zap, Shield, Rocket, Users, Award, Menu, X } from "lucide-react";
+import { useState } from "react";
 
-// Animated Cube Component
-function AnimatedCube({
+// Navigation Component
+function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                  <div className="w-4 h-4 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-xl font-bold text-white">3D Future</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-8">
+              <a
+                href="#home"
+                className="text-white hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Home
+              </a>
+              <a
+                href="#features"
+                className="text-gray-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Features
+              </a>
+              <a
+                href="#about"
+                className="text-gray-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                About
+              </a>
+              <a
+                href="#testimonials"
+                className="text-gray-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Testimonials
+              </a>
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-300 hover:text-white p-2"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-black/90 backdrop-blur-md">
+              <a
+                href="#home"
+                className="text-white block px-3 py-2 text-base font-medium"
+              >
+                Home
+              </a>
+              <a
+                href="#features"
+                className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium"
+              >
+                Features
+              </a>
+              <a
+                href="#about"
+                className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium"
+              >
+                About
+              </a>
+              <a
+                href="#testimonials"
+                className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium"
+              >
+                Testimonials
+              </a>
+              <div className="px-3 py-2">
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                >
+                  Get Started
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// Blue Gradient Cube Component
+function BlueCube({
   position,
   scale = 1,
+  delay = 0,
 }: {
   position: [number, number, number];
   scale?: number;
+  delay?: number;
 }) {
   const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.5;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.5 + delay;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3 + delay;
       meshRef.current.position.y =
-        position[1] + Math.sin(state.clock.elapsedTime + position[0]) * 0.2;
+        position[1] +
+        Math.sin(state.clock.elapsedTime + delay + position[0]) * 0.3;
     }
   });
 
@@ -32,10 +151,52 @@ function AnimatedCube({
     <mesh ref={meshRef} position={position} scale={scale}>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial
-        color="#dfa316"
+        color="#3b82f6"
+        metalness={0.9}
+        roughness={0.1}
+        emissive="#1e40af"
+        emissiveIntensity={0.2}
+      />
+    </mesh>
+  );
+}
+
+// Pyramid Component
+function Pyramid({ position }: { position: [number, number, number] }) {
+  const meshRef = useRef<Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.2;
+      meshRef.current.position.y =
+        position[1] + Math.sin(state.clock.elapsedTime) * 0.1;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={position}>
+      <coneGeometry args={[1.5, 2, 4]} />
+      <meshStandardMaterial
+        color="#60a5fa"
         metalness={0.8}
         roughness={0.2}
-        emissive="#333333"
+        emissive="#2563eb"
+        emissiveIntensity={0.3}
+      />
+    </mesh>
+  );
+}
+
+// Path/Road Component
+function Path() {
+  return (
+    <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[20, 4]} />
+      <meshStandardMaterial
+        color="#1e293b"
+        metalness={0.3}
+        roughness={0.7}
+        emissive="#0f172a"
         emissiveIntensity={0.1}
       />
     </mesh>
@@ -46,21 +207,40 @@ function AnimatedCube({
 function Scene() {
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} color="#60a5fa" />
+      <pointLight position={[-10, 10, 10]} intensity={1.5} color="#3b82f6" />
+      <pointLight position={[0, -10, 5]} intensity={0.8} color="#1e40af" />
 
-      {/* Multiple cubes arranged in a pattern */}
-      <AnimatedCube position={[0, 0, 0]} scale={1.5} />
-      <AnimatedCube position={[-3, 1, -2]} scale={0.8} />
-      <AnimatedCube position={[3, -1, -1]} scale={1.2} />
-      <AnimatedCube position={[-2, -2, 1]} scale={0.6} />
-      <AnimatedCube position={[2, 2, -3]} scale={1} />
-      <AnimatedCube position={[0, -3, -2]} scale={0.9} />
-      <AnimatedCube position={[-4, 0, 1]} scale={0.7} />
-      <AnimatedCube position={[4, 1, 2]} scale={1.1} />
+      {/* Path/Road */}
+      <Path />
 
-      <OrbitControls enableZoom={false} enablePan={false} />
+      {/* Pyramid on top of the path */}
+      <Pyramid position={[0, 0, 0]} />
+
+      {/* Left side cubes (6 cubes) */}
+      <BlueCube position={[-8, 2, -2]} scale={0.8} delay={0} />
+      <BlueCube position={[-6, 0, -1]} scale={1.0} delay={0.5} />
+      <BlueCube position={[-7, -1, 1]} scale={0.7} delay={1.0} />
+      <BlueCube position={[-9, 1, 0]} scale={0.9} delay={1.5} />
+      <BlueCube position={[-5, 3, -3]} scale={0.6} delay={2.0} />
+      <BlueCube position={[-8, -2, 2]} scale={1.1} delay={2.5} />
+
+      {/* Right side cubes (6 cubes) */}
+      <BlueCube position={[8, 2, -2]} scale={0.8} delay={3.0} />
+      <BlueCube position={[6, 0, -1]} scale={1.0} delay={3.5} />
+      <BlueCube position={[7, -1, 1]} scale={0.7} delay={4.0} />
+      <BlueCube position={[9, 1, 0]} scale={0.9} delay={4.5} />
+      <BlueCube position={[5, 3, -3]} scale={0.6} delay={5.0} />
+      <BlueCube position={[8, -2, 2]} scale={1.1} delay={5.5} />
+
+      <OrbitControls
+        enableZoom={true}
+        enablePan={false}
+        maxDistance={15}
+        minDistance={5}
+        maxPolarAngle={Math.PI / 2}
+      />
       <Environment preset="night" />
     </>
   );
@@ -69,10 +249,16 @@ function Scene() {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Navigation */}
+      <Navigation />
+
       {/* Hero Section with 3D */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section
+        id="home"
+        className="relative h-screen flex items-center justify-center overflow-hidden pt-16"
+      >
         <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
+          <Canvas camera={{ position: [0, 5, 12], fov: 60 }}>
             <Suspense fallback={null}>
               <Scene />
             </Suspense>
@@ -80,7 +266,7 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">
             Future is Here
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-2xl mx-auto">
@@ -90,14 +276,14 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-white text-black hover:bg-gray-200 text-lg px-8 py-3"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3"
             >
               Get Started
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-3"
+              className="border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white text-lg px-8 py-3"
             >
               Learn More
             </Button>
@@ -106,7 +292,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-gray-900">
+      <section id="features" className="py-20 px-4 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -119,9 +305,9 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-black border-gray-800 hover:border-gray-600 transition-colors">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8 text-center">
-                <Zap className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
+                <Zap className="w-12 h-12 mx-auto mb-4 text-blue-400" />
                 <h3 className="text-2xl font-bold mb-4 text-white">
                   Lightning Fast
                 </h3>
@@ -132,7 +318,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black border-gray-800 hover:border-gray-600 transition-colors">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8 text-center">
                 <Shield className="w-12 h-12 mx-auto mb-4 text-blue-400" />
                 <h3 className="text-2xl font-bold mb-4 text-white">
@@ -144,9 +330,9 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black border-gray-800 hover:border-gray-600 transition-colors">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8 text-center">
-                <Rocket className="w-12 h-12 mx-auto mb-4 text-red-400" />
+                <Rocket className="w-12 h-12 mx-auto mb-4 text-blue-400" />
                 <h3 className="text-2xl font-bold mb-4 text-white">Scalable</h3>
                 <p className="text-gray-400">
                   Grows with your business from startup to enterprise
@@ -158,7 +344,7 @@ export default function LandingPage() {
       </section>
 
       {/* About Us Section */}
-      <section className="py-20 px-4 bg-black">
+      <section id="about" className="py-20 px-4 bg-black">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -178,37 +364,37 @@ export default function LandingPage() {
               </p>
               <div className="flex items-center gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">500+</div>
+                  <div className="text-3xl font-bold text-blue-400">500+</div>
                   <div className="text-gray-400">Projects</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">50+</div>
+                  <div className="text-3xl font-bold text-blue-400">50+</div>
                   <div className="text-gray-400">Team Members</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">5+</div>
+                  <div className="text-3xl font-bold text-blue-400">5+</div>
                   <div className="text-gray-400">Years Experience</div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-gray-900 border-gray-800 p-6">
-                <Users className="w-8 h-8 mb-4 text-green-400" />
+              <Card className="bg-gray-900 border-gray-800 hover:border-blue-500 transition-colors p-6">
+                <Users className="w-8 h-8 mb-4 text-blue-400" />
                 <h4 className="font-bold text-white mb-2">Expert Team</h4>
                 <p className="text-sm text-gray-400">
                   Skilled professionals dedicated to excellence
                 </p>
               </Card>
-              <Card className="bg-gray-900 border-gray-800 p-6">
-                <Award className="w-8 h-8 mb-4 text-purple-400" />
+              <Card className="bg-gray-900 border-gray-800 hover:border-blue-500 transition-colors p-6">
+                <Award className="w-8 h-8 mb-4 text-blue-400" />
                 <h4 className="font-bold text-white mb-2">Award Winning</h4>
                 <p className="text-sm text-gray-400">
                   Recognized for innovation and quality
                 </p>
               </Card>
-              <Card className="bg-gray-900 border-gray-800 p-6 col-span-2">
-                <Zap className="w-8 h-8 mb-4 text-yellow-400" />
+              <Card className="bg-gray-900 border-gray-800 hover:border-blue-500 transition-colors p-6 col-span-2">
+                <Zap className="w-8 h-8 mb-4 text-blue-400" />
                 <h4 className="font-bold text-white mb-2">Innovation First</h4>
                 <p className="text-sm text-gray-400">
                   Always pushing the boundaries of what's possible
@@ -220,7 +406,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-gray-900">
+      <section id="testimonials" className="py-20 px-4 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -233,13 +419,13 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-black border-gray-800">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8">
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      className="w-5 h-5 fill-blue-400 text-blue-400"
                     />
                   ))}
                 </div>
@@ -248,7 +434,7 @@ export default function LandingPage() {
                   absolutely stunning. It increased our engagement by 300%."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded-full mr-4"></div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full mr-4"></div>
                   <div>
                     <div className="font-bold text-white">Sarah Johnson</div>
                     <div className="text-gray-400 text-sm">CEO, TechCorp</div>
@@ -257,13 +443,13 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black border-gray-800">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8">
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      className="w-5 h-5 fill-blue-400 text-blue-400"
                     />
                   ))}
                 </div>
@@ -272,7 +458,7 @@ export default function LandingPage() {
                   expectations. The team truly understands modern design."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded-full mr-4"></div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full mr-4"></div>
                   <div>
                     <div className="font-bold text-white">Michael Chen</div>
                     <div className="text-gray-400 text-sm">
@@ -283,13 +469,13 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black border-gray-800">
+            <Card className="bg-black border-gray-800 hover:border-blue-500 transition-colors">
               <CardContent className="p-8">
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      className="w-5 h-5 fill-blue-400 text-blue-400"
                     />
                   ))}
                 </div>
@@ -298,7 +484,7 @@ export default function LandingPage() {
                   create an immersive experience our users love."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded-full mr-4"></div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full mr-4"></div>
                   <div>
                     <div className="font-bold text-white">Emily Rodriguez</div>
                     <div className="text-gray-400 text-sm">
@@ -317,7 +503,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4">3D Future</h3>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                  <div className="w-4 h-4 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-2xl font-bold text-white">3D Future</span>
+              </div>
               <p className="text-gray-400 mb-4">
                 Pioneering the future of digital experiences through innovative
                 3D technology.
@@ -327,30 +518,54 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold mb-4 text-white">Services</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>3D Design</li>
-                <li>Web Development</li>
-                <li>Interactive Experiences</li>
-                <li>Consulting</li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  3D Design
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Web Development
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Interactive Experiences
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Consulting
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-4 text-white">Company</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>About Us</li>
-                <li>Careers</li>
-                <li>Blog</li>
-                <li>Contact</li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  About Us
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Careers
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Blog
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Contact
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-4 text-white">Connect</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Twitter</li>
-                <li>LinkedIn</li>
-                <li>GitHub</li>
-                <li>Dribbble</li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Twitter
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  LinkedIn
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  GitHub
+                </li>
+                <li className="hover:text-blue-400 cursor-pointer transition-colors">
+                  Dribbble
+                </li>
               </ul>
             </div>
           </div>
